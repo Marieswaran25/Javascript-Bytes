@@ -12,5 +12,5 @@ Array.prototype.myMap=function (callbackLogic){
 console.log(inputArray.map(twice));
 console.log(inputArray.myMap(thrice));
 
-// if we use array.prototype we can use like array.map(callback) otherwise we can call it as function
+// if we use array.prototype we can use like array.map(callback) otherwise we can call it as function and this will pints to the array.
 // myMap and map is a higher order functions.
