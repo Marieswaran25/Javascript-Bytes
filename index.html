@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .draggable {
+        width: 100px;
+        height: 100px;
+        background-color: lightblue;
+        position: absolute;
+        cursor: grab;
+      }
+
+      .item {
+        width: 100px;
+        height: 100px;
+        background-color: lightgreen;
+        margin: 10px;
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="draggable" id="draggable">Drag me!</div>
+    <div class="item" id="item1">Item 1</div>
+    <div class="item" id="item2">Item 2</div>
+    <div class="item" id="item3">Item 3</div>
+    <div class="item" id="item4">Item 4</div>
+    <div class="item" id="item5">Item 5</div>
+    <div class="item" id="item6">Item 6</div>
+
+    <script>
+      let isDragging = false;
+      let draggable;
+
+      const handleDragStart = (event) => {
+        isDragging = true;
+        draggable = event.target;
+
+        // Calculate the initial cursor position relative to the draggable element
+        const offsetX = event.clientX - draggable.getBoundingClientRect().left;
+        const offsetY = event.clientY - draggable.getBoundingClientRect().top;
+
+        // Store the offset values as data attributes on the draggable element
+        draggable.dataset.offsetX = offsetX;
+        draggable.dataset.offsetY = offsetY;
+
+        // Set the draggable element to be slightly transparent while dragging
+        draggable.style.opacity = "0.5";
+      };
+
+      const handleDrag = (event) => {
+        if (!isDragging) return;
+
+        // Calculate the new position of the draggable element based on cursor position and offsets
+        const offsetX = parseFloat(draggable.dataset.offsetX);
+        const offsetY = parseFloat(draggable.dataset.offsetY);
+        const newX = event.clientX - offsetX;
+        const newY = event.clientY - offsetY;
+
+        // Update the position of the draggable element
+        draggable.style.left = newX + "px";
+        draggable.style.top = newY + "px";
+      };
+
+      const handleDragEnd = () => {
+        isDragging = false;
+
+        // Reset the opacity and remove data attributes
+        draggable.style.opacity = "1";
+        delete draggable.dataset.offsetX;
+        delete draggable.dataset.offsetY;
+      };
+
+      const draggableElement = document.getElementById("draggable");
+      draggableElement.addEventListener("mousedown", handleDragStart);
+      document.addEventListener("mousemove", handleDrag);
+      document.addEventListener("mouseup", handleDragEnd);
+    </script>
+  </body>
+</html>

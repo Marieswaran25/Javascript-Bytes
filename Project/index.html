@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Shuffling and Reverting</title>
+</head>
+<body>
+  <input type="file" id="image-input">
+  <canvas id="canvas"></canvas>
+  <canvas id="canvas2"></canvas>
+
+
+  <script>
+    // Function to shuffle an image using Arnold's Cat Map algorithm
+    function shuffleImage(imageData, iterations) {
+        console.log(imageData)
+      const { width, height, data } = imageData;
+
+      for (let i = 0; i < iterations; i++) {
+        const newData = new Uint8ClampedArray(data);
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const newIndex = ((2 * x + y) % width + ((x + y) % height) * width) * 4;
+
+            data.copyWithin(newIndex, y * width * 4 + x * 4, y * width * 4 + x * 4 + 4);
+          }
+        }
+      }
+
+      return imageData;
+    }
+
+    // Function to revert a shuffled image using Arnold's Cat Map algorithm
+    function revertImage(imageData, iterations) {
+      const { width, height, data } = imageData;
+
+      for (let i = 0; i < iterations; i++) {
+        const newData = new Uint8ClampedArray(data);
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const newIndex = ((x - y + width) % width + ((x - 2 * ((x - y + width) % width) + y + 2 * width) % height) * width) * 4;
+
+            data.copyWithin(newIndex, y * width * 4 + x * 4, y * width * 4 + x * 4 + 4);
+          }
+        }
+      }
+
+      return imageData;
+    }
+
+    // Function to handle image input change event
+    function handleImageInputChange(event) {
+      const file = event.target.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const image = new Image();
+
+          image.onload = function () {
+            const canvas = document.getElementById('canvas');
+            const canvas2 = document.getElementById('canvas2');
+
+            const context = canvas.getContext('2d');
+
+            // Set canvas dimensions to match the image
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            canvas2.width = image.width;
+            canvas2.height = image.height;
+
+            // Draw the original image on the canvas
+            context.drawImage(image, 0, 0);
+
+            // Get the image data from the canvas
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            console.log(imageData)
+            const imageData2 = context.getImageData(0, 0, canvas2.width, canvas2.height);
+
+            // Shuffle the image
+            const shuffledImageData = shuffleImage(imageData, 1);
+            console.log(shuffledImageData) // Perform 10 shuffling iterations
+
+            // Revert the shuffled image
+            const revertedImageData = revertImage(shuffledImageData, 1); // Perform 10 reverting iterations
+
+            // Draw the reverted image on the canvas
+            context.putImageData(revertedImageData, 0, 0);
+          };
+
+          image.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Attach event listener to the image input element
+    const imageInput = document.getElementById('image-input');
+    imageInput.addEventListener('change', handleImageInputChange);
+  </script>
+</body>
+</html>
